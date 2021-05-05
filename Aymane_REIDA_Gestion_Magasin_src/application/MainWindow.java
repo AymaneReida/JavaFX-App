@@ -31,7 +31,6 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 
 public class MainWindow extends Application {
-	MainHandler handler = new MainHandler(this);
 	private BorderPane root = new BorderPane();
 	private Scene scene = new Scene(root);
 
@@ -172,76 +171,6 @@ public class MainWindow extends Application {
 		});
 	}
 
-	public void creatLoginWindow(Stage window) {
-		// Create the custom dialog.
-		Dialog<Pair<String, String>> dialog = new Dialog<>();
-		dialog.setTitle("Login Dialog");
-		dialog.setHeaderText("Entrez votre login et votre mot de passe");
-		dialog.initOwner(window);
-
-		// Set the icon (must be included in the project).
-		ImageView image = new ImageView(this.getClass().getResource("login.png").toString());
-		image.setFitWidth(100);
-		image.setFitHeight(100);
-		image.setPreserveRatio(true);
-		image.setSmooth(true);
-		image.setCache(true);
-		dialog.setGraphic(image);
-		Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        dialog.setX((screenBounds.getWidth() - 450f) / 2);
-        dialog.setY((screenBounds.getHeight() - 400f) / 2);
-
-		// Set the button types.
-		ButtonType loginButtonType = new ButtonType("Login", ButtonData.OK_DONE);
-		dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-
-		// Create the username and password labels and fields.
-		GridPane grid = new GridPane();
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(20, 150, 10, 10));
-		// grid.setAlignment(Pos.CENTER);
-
-		TextField username = new TextField();
-		username.setPromptText("Username");
-		PasswordField password = new PasswordField();
-		password.setPromptText("Password");
-
-		grid.add(new Label("Login:"), 0, 0);
-		grid.add(username, 1, 0);
-		grid.add(new Label("Password:"), 0, 1);
-		grid.add(password, 1, 1);
-
-		// Enable/Disable login button depending on whether a username was entered.
-		Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
-		loginButton.setDisable(true);
-
-		// Do some validation (using the Java 8 lambda syntax).
-		username.textProperty().addListener((observable, oldValue, newValue) -> {
-			loginButton.setDisable(newValue.trim().isEmpty());
-		});
-
-		dialog.getDialogPane().setContent(grid);
-
-		// Request focus on the username field by default.
-		Platform.runLater(() -> username.requestFocus());
-
-		// Convert the result to a username-password-pair when the login button is
-		// clicked.
-		dialog.setResultConverter(dialogButton -> {
-			if (dialogButton == loginButtonType) {
-				return new Pair<>(username.getText(), password.getText());
-			}
-			return null;
-		});
-
-		Optional<Pair<String, String>> result = dialog.showAndWait();
-
-		result.ifPresent(loginPassword -> {
-			handler.connectClick(loginPassword.getKey(), loginPassword.getValue());
-		});
-	}
-
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
@@ -256,19 +185,7 @@ public class MainWindow extends Application {
 		window.setHeight(650);
 		window.setTitle("Gestion de magasin");
 		window.getIcons().add(new Image("file:icon.png"));
-		creatLoginWindow(window);
-		if (handler.user != null) {
-			window.show();
-		} else {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Erreur");
-			alert.setHeaderText("Verifiez les informations entrées");
-			alert.setContentText("Error le login ou le mot de passe est incorrect");
-			alert.initModality(Modality.APPLICATION_MODAL);
-			alert.initOwner(window);
-
-			alert.showAndWait();
-		}
+		window.show();
 	}
 
 }
